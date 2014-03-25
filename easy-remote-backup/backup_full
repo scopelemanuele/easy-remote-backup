@@ -1,0 +1,48 @@
+#!/bin/bash
+
+#               Created by scopel emanuele scopel.emanuele(at)gmail.com
+#                               v 1.0 15 mar 2014
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+MYMAIL='your.mail-address@yourmailserver.it'
+
+DIRSNAR='/var/tmp'
+SORGENTI='/path/to/files_source'
+DESTINAZIONE='/path/to/backup'
+DATE=`date '+%a-%d-%B-%Y-ore-%k-%M'
+
+FILEBACKUP="$DESTINAZIONE/backup-full-$DATE.tar.gz"
+
+echo "cancello file log"
+rm -f "$DIRSNAR/backup.snar"
+
+echo "eseguo dump del database"
+mysqldump -u user_db -h localhost -ppasswd_db name_db | gzip -9 > "$SORGENTI/tmp/name_of_backup-$DATE.sql.gz"
+
+echo "creo l’archivio incrementale"
+tar zcpf "$FILEBACKUP" --listed-incremental "$DIRSNAR/backup.snar" "$SORGENTI"
+
+echo "se esiste il file di backup appena creato cancello i vecchi"
+if [ -f "$FILEBACKUP" ]
+then
+
+echo "cancello tutti i file di backup incrementale"
+find "$DESTINAZIONE" -type f -name 'backup-inc*' -exec rm {} \;
+
+echo "cancello il file di backup completo piu’ vecchio di 6 giorni"
+find "$DESTINAZIONE" -ctime +6 -type f -name 'backup-full*' -exec rm  {} \;
+
+else
+echo "notifico il problema"
+echo "Backup su $FILEBACKUP non riuscito" | mail -s "Problema backup server" $MYMAIL
+fi
