@@ -226,8 +226,8 @@ def delete_max_age(config):
     logging.info("***Delete full backup in %s older %s" % (local_dir, config['max_full_backup_age']))
     logging.info("***Command: find %s -ctime +%s -type f -name backup-full* -exec rm  {} \;" % (local_dir, config['max_full_backup_age']))
     os.popen("find %s -ctime +%s -type f -name backup-full* -exec rm  {} \;" % (local_dir, config['max_full_backup_age']))
-    logging.info("***Delete inc backup in %s older %s" % (local_dir, config['max_inc_backup_age']))
-    logging.info("***Command: find %s -ctime +%s -type f -name backup-inc* -exec rm  {} \;" % (local_dir, config['max_inc_backup_age']))
+    logging.info("***Delete inc backup in %s" % (local_dir, config['max_inc_backup_age']))
+    logging.info("***Command: find %s -type f -name backup-inc* -exec rm  {} \;" % (local_dir, config['max_inc_backup_age']))
     os.popen("find %s -ctime +%s -type f -name backup-inc* -exec rm  {} \;" % (local_dir, config['max_inc_backup_age']))
 
 
