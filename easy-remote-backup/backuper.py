@@ -41,8 +41,8 @@ CONFIG = {
     "mount_base": "/media",
     "pwd": "********",
     "port": 22,
+    "delete_day": 6,
     "max_full_backup_age": 90,
-    "max_inc_backup_age": 6,
 }
 
 
@@ -223,12 +223,15 @@ def delete_max_age(config):
             local_dir = config['local_dir']
     else:
         local_dir = config['local_dir']
-    logging.info("***Delete full backup in %s older %s" % (local_dir, config['max_full_backup_age']))
-    logging.info("***Command: find %s -ctime +%s -type f -name backup-full* -exec rm  {} \;" % (local_dir, config['max_full_backup_age']))
-    os.popen("find %s -ctime +%s -type f -name backup-full* -exec rm  {} \;" % (local_dir, config['max_full_backup_age']))
-    logging.info("***Delete inc backup in %s" % (local_dir, config['max_inc_backup_age']))
-    logging.info("***Command: find %s -type f -name backup-inc* -exec rm  {} \;" % (local_dir, config['max_inc_backup_age']))
-    os.popen("find %s -ctime +%s -type f -name backup-inc* -exec rm  {} \;" % (local_dir, config['max_inc_backup_age']))
+    day_cron = date.today().isoweekday()
+    if str(day_cron) in config['delete_day']:
+        logging.info("***Delete full backup in %s older %s" % (local_dir, config['max_full_backup_age']))
+        logging.info("***Command: find %s -ctime +%s -type f -name backup-full* -exec rm  {} \;" % (local_dir, config['max_full_backup_age']))
+        os.popen("find %s -ctime +%s -type f -name backup-full* -exec rm  {} \;" % (local_dir, config['max_full_backup_age']))
+
+        logging.info("***Delete inc backup in %s" % (local_dir))
+        logging.info("***Command: find %s -type f -name backup-inc* -exec rm  {} \;" % (local_dir))
+        os.popen("find %s -type f -name backup-inc* -exec rm  {} \;" % (local_dir))
 
 
 def main():
